@@ -1,4 +1,6 @@
-clear all; clc; close all;
+% clear all; clc; close all;
+
+global Quad;
 
 %% 설정 변수
 n = 4;                      % 모터(액추에이터) 개수
@@ -45,10 +47,10 @@ L= 0.56;
 %
 %   ccw 2   4 cw
 
-K = [ ct_val,    ct_val,    ct_val,    ct_val;
-      -ct_val*L,  ct_val*L, ct_val*L, -ct_val*L;
-       ct_val*L, ct_val*L,  -ct_val*L, -ct_val*L;
-      cq_val,    -cq_val,    cq_val,     -cq_val];
+% K = [ ct_val,    ct_val,    ct_val,    ct_val;
+%       -ct_val*L,  ct_val*L, ct_val*L, -ct_val*L;
+%        ct_val*L, ct_val*L,  -ct_val*L, -ct_val*L;
+%       cq_val,    -cq_val,    cq_val,     -cq_val];
 
 % Quadrotor+
 %            1 ccw
@@ -58,10 +60,10 @@ K = [ ct_val,    ct_val,    ct_val,    ct_val;
 %
 %            3 ccw
 
-% K = [ ct_val,    ct_val,    ct_val,    ct_val;
-%     0,  -ct_val*L, 0, ct_val*L;
-%     ct_val*L, 0,  -ct_val*L, 0;
-%     cq_val,    -cq_val,    cq_val,     -cq_val];
+K = [ ct_val,    ct_val,    ct_val,    ct_val;
+    0,  -ct_val*L, 0, ct_val*L;
+    ct_val*L, 0,  -ct_val*L, 0;
+    cq_val,    -cq_val,    cq_val,     -cq_val];
 
 ACS_points_normal = (K * V_box')';          % 정상 조건: [T,L,M,N], (10)식, ACS_points_normal 은 V'_omega이다
 
@@ -129,6 +131,12 @@ convexIdx_TLMN = unique(hull_TLMN);     % convexIdx_TLMN 이게 (11)식에서 �
 [A_all_TLMN, b_all_TLMN, Aeq_all_TLMN, beq_all_TLMN] = vert2lcon(pts_TLMN, 1e-10);
 % 이론상 vert2lcon 에 pts_TLMN를 넣으면 안된다. V_omega = pts_TLMN(convexIdx_TLMN, :) 해서 V_omega 이거를 넣어야한다
 % 하지만 vert2lcon(pts_TLMN, 1e-10); 를 해도 맞는 이유는 vert2lcon 가 어차피 내부점들을 소거하기 때문이다
+Quad.A_all_TLMN = A_all_TLMN;
+Quad.b_all_TLMN = b_all_TLMN;
+
+Quad.Aeq_all_TLMN = Aeq_all_TLMN;
+Quad.beq_all_TLMN = beq_all_TLMN;
+
 disp('Normal ACS (T, L, M, N)의 부등식 조건:');
 disp('Inequality A = '); disp(A_all_TLMN);
 disp('Inequality b = '); disp(b_all_TLMN);
@@ -749,3 +757,67 @@ xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Yaw Moment 
 title('(C5) Combined Slice: T=mg => (Roll, Pitch, Yaw)');
 grid on; view(3); camlight; lighting gouraud;
 legend('Normal surface','Normal pts','Normal convhull pts','Faulty surface','Faulty pts','Faulty convhull pts','Location','best');
+
+
+
+
+%% 비교: 정상 ACS vs. 단순 상/하한(Box) 제약 ACS (N=0 슬라이스)
+disp('--- 비교: 정상 ACS vs. 박스 제약 ACS (N=0 단면) ---');
+
+% --- [정의] 단순 상/하한(Box) 제약 조건 ---
+% T, L, M, N의 개별적인 최대/최소값을 정의합니다.
+T_max_box = 45.6; T_min_box = 0;
+L_max_box = 6.38; L_min_box = -6.38;
+M_max_box = 6.38; M_min_box = -6.38;
+N_max_box = 2.37; N_min_box = -2.37;
+
+% 이 상/하한을 H-representation (A*u <= b) 형태로 변환합니다.
+A_box_constr = [ eye(4); -eye(4) ];
+b_box_constr = [ T_max_box;  L_max_box;  M_max_box;  N_max_box;
+                -T_min_box; -L_min_box; -M_min_box; -N_min_box ];
+
+% --- [계산] 각 ACS의 N=0 슬라이스 꼭짓점 계산 ---
+Aeq_slice_N0 = [0 0 0 1]; 
+beq_slice_N0 = 0;
+
+% 1. 실제 정상 ACS의 N=0 슬라이스 꼭짓점 (이미 계산된 'V_sliceN0' 변수 사용)
+% V_sliceN0 변수는 '%% 8. 정상 슬라이싱: N=0' 섹션에서 계산되었습니다.
+
+% 2. 박스 제약 ACS의 N=0 슬라이스 꼭짓점 계산
+[V_sliceN0_box, ~, ~] = lcon2vert(A_box_constr, b_box_constr, Aeq_slice_N0, beq_slice_N0, 1e-10, true);
+
+% --- [준비] 시각화를 위한 데이터 추출 및 Convex Hull 계산 ---
+% 정상 ACS 슬라이스 데이터 준비
+pts_sliceN0_normal = V_sliceN0(:, [2, 3, 1]); % x=Roll, y=Pitch, z=Thrust
+[hull_sliceN0_normal, ~] = convhulln(pts_sliceN0_normal);
+convexIdx_sliceN0_normal = unique(hull_sliceN0_normal);
+
+% 박스 제약 ACS 슬라이스 데이터 준비
+pts_sliceN0_box = V_sliceN0_box(:, [2, 3, 1]); % x=Roll, y=Pitch, z=Thrust
+[hull_sliceN0_box, ~] = convhulln(pts_sliceN0_box);
+convexIdx_sliceN0_box = unique(hull_sliceN0_box);
+
+% --- [시각화] 두 개의 ACS 단면을 하나의 그래프에 그리기 ---
+figure('Name','(Comparison) N=0 Slice: True ACS vs Box ACS','NumberTitle','off');
+hold on;
+
+% 1. 실제 정상 ACS (파란색)
+trisurf(hull_sliceN0_normal, pts_sliceN0_normal(:,1), pts_sliceN0_normal(:,2), pts_sliceN0_normal(:,3), ...
+    'FaceColor','cyan','FaceAlpha',0.3,'EdgeColor','b','LineStyle','-');
+plot3(pts_sliceN0_normal(:,1), pts_sliceN0_normal(:,2), pts_sliceN0_normal(:,3), 'bo','MarkerSize',10);
+plot3(pts_sliceN0_normal(convexIdx_sliceN0_normal,1), pts_sliceN0_normal(convexIdx_sliceN0_normal,2), pts_sliceN0_normal(convexIdx_sliceN0_normal,3), ...
+    'ks','MarkerSize',8,'MarkerFaceColor','none');
+    
+% 2. 박스 제약 ACS (빨간색)
+trisurf(hull_sliceN0_box, pts_sliceN0_box(:,1), pts_sliceN0_box(:,2), pts_sliceN0_box(:,3), ...
+    'FaceColor','green','FaceAlpha',0.3,'EdgeColor','y','LineStyle','--');
+plot3(pts_sliceN0_box(:,1), pts_sliceN0_box(:,2), pts_sliceN0_box(:,3), 'yo','MarkerSize',12);
+plot3(pts_sliceN0_box(convexIdx_sliceN0_box,1), pts_sliceN0_box(convexIdx_sliceN0_box,2), pts_sliceN0_box(convexIdx_sliceN0_box,3), ...
+    'k+','MarkerSize',6,'MarkerFaceColor','none');
+
+xlabel('Roll Moment L (Nm)'); 
+ylabel('Pitch Moment M (Nm)'); 
+zlabel('Thrust T (N)');
+title('정상 상태 ACS와 박스 제약 ACS 비교 (N=0 단면)');
+grid on; view(3); camlight; lighting gouraud;
+legend('Normal surface','Normal pts','Normal convhull pts','Box surface','Box pts','Box convhull pts','Location','best');

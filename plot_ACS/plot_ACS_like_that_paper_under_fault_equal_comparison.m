@@ -16,6 +16,12 @@ Fault_Level = [0.999];  % 1이면 완전, 0이면 정상; 여기서는 0.999로 
 A_box = [ eye(n); -eye(n) ];
 b_box = [ w_max_val * ones(n,1); -w_min_val * ones(n,1) ];
 [V_box, nr_box, nre_box] = lcon2vert(A_box, b_box, [], [], 1e-10, true);   % (9) 식
+
+% --- [추가] 수치적 오차를 0으로 정리 ---
+tolerance = 1e-9; % 허용 오차 설정 (lcon2vert의 tol보다 약간 크게 설정)
+V_box(abs(V_box) < tolerance) = 0;
+% ---------------------------------------
+
 disp('정상 조건: 8차원 박스의 극점 (V_box):');   % V_box 는 9식의 V_y 이다
 disp(V_box);
 

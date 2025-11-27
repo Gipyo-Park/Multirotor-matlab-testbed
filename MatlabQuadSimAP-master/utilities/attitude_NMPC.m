@@ -1,6 +1,6 @@
 function attitude_NMPC
 % =========================================================================
-% NMPC 기반 자세 제어기 (attitude_MPC_v1과 구조 완벽히 통일)
+% NMPC 기반 자세 제어기 (attitude_MPC과 구조 완벽히 통일)
 %
 % 1. 초기화: 시뮬레이션 시작 시 한 번만 실행하여 NMPC에 필요한 모든
 %    영구 변수(가중치, 옵션, 과거 상태/입력 등)를 계산하고 저장합니다.
@@ -63,7 +63,7 @@ if Quad.init == 0
     Delta_umax = 0.8 * umax;
 
     % fmincon 옵션
-    opts = optimoptions('fmincon','Algorithm','sqp','Display','off', 'EnableFeasibilityMode', true);
+    opts = optimoptions('fmincon','Algorithm','active-set','Display','off', 'EnableFeasibilityMode', true);
 
     % 초기값 설정
     x_m_past = [Quad.phi; Quad.p; Quad.theta; Quad.q; Quad.psi; Quad.r];

@@ -325,14 +325,24 @@ Quad.Cm = eye(6);
 % Quad.Dm = zeros(3,3);
 Quad.Dm = zeros(6, 3);
 
-% [Ad,Bd,Cd,Dd] = c2dm(Am,Bm,Cm,Dm,0.01); % Converting from Continuous to Discrete Time
 
-% [A_aug,B_aug,C_aug] = augment_mimo(Ad, Bd, Cd, num_of_states, num_of_inputs, num_of_outputs);
-% [P, H] = calculate_prediction_matrices(A_aug, B_aug, C_aug, Np, Nc); % Y = P*X(k) + H*U(k)
-% 
-% 
-% umax = [Quad.U2_max ; Quad.U3_max ; Quad.U4_max];
-% umin = [Quad.U2_min ; Quad.U3_min ; Quad.U4_min];
-% Delta_umax = 0.6*umax;
-% 
-% [CC, dd, dupast] = constraints_mimo(Delta_umax, umax, umin, num_of_inputs, Nc);
+%% MPC /  선형화하기위해 가정으로 인해 phi_dot ≈ p , theta_dot ≈ q , psi_dot ≈ r
+
+% X = [phi; phi_dot; theta; theta_dot; psi; psi_dot; z; z_dot]
+% u = [ft; tau_x; tau_y; tau_z]
+% y = [phi; theta; psi]
+
+X_dot_AA = [phi_dot; phi_ddot; theta_dot; theta_ddot; psi_dot; psi_ddot; z_dot; z_ddot];
+Am_AA = jacobian(X_dot_AA,[phi; phi_dot; theta; theta_dot; psi; psi_dot; z; z_dot]); % phi_dot ≈ p , theta_dot ≈ q , psi_dot ≈ r 
+Bm_AA = jacobian(X_dot_AA,[ft; tau_x; tau_y; tau_z]);
+
+% 평형점에서 평가 (phi=0, phi_dot=0, theta=0, theta_dot=0, psi=0, psi_dot=0)
+Quad.Am_AA = double(subs(Am_AA, {phi,phi_dot,theta,theta_dot,psi,psi_dot,z,z_dot}, {0, 0, 0, 0, 0, 0, 0, 0}));
+Quad.Bm_AA = double(subs(Bm_AA, {phi,phi_dot,theta,theta_dot,psi,psi_dot,z,z_dot}, {0, 0, 0, 0, 0, 0, 0, 0}));
+
+% Quad.Cm = [1 0 0 0 0 0;
+%       0 0 1 0 0 0;
+%       0 0 0 0 1 0];
+Quad.Cm_AA = eye(8);
+% Quad.Dm = zeros(3,3);
+Quad.Dm_AA = zeros(8, 4);

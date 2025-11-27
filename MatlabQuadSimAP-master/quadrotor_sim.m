@@ -26,6 +26,7 @@ plot_quad_model;
 
 quad_variables;
 model_dynamics;
+quad_ACS;
 quad_dynamics_nonlinear;
 
 
@@ -87,17 +88,30 @@ while Quad.t_plot(Quad.counter-1)< max(Quad.t_plot);
 
 
     
-    % Implement Controller
+    % Position Controller
     position_PID;
+
+
+    % Attitude Controller
+    % attitude_PID;
     % attitude_LQR;
     % attitude_LQI;
-    % full_LQR;
     % attitude_MPC;
-    attitude_MPC_v1;
-    % attitude_NMPC;
-    % attitude_PID;
+    attitude_NMPC;
+
+
+    % Attitude / Altitude Controller
+    % AttAlt_MPC;
+    
+    
+    % Rate Controller
     % rate_PID;
     
+    % Combined Controller
+    % full_LQR;
+
+
+
     % Calculate Desired Motor Speeds
     quad_motor_speed;
     
