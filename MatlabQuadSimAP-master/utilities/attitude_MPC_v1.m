@@ -1,4 +1,4 @@
-function attitude_MPC
+function attitude_MPC_v1
 % =========================================================================
 % MPC 기반 자세 제어기 (attitude_LQR 대체용)
 %
@@ -34,14 +34,14 @@ persistent psi_error_sum;
 
 % --- MPC 파라미터 및 계산된 행렬을 저장하기 위한 영구 변수 ---
 persistent P H CC dd dupast A_aug C_aug
-persistent Qy Ru opts
+persistent Qx Ru opts
 persistent x_m_past u_past
 persistent DeltaU_past
 
 % MPC 파라미터 정의
 num_of_states = 6; % Number of states
 num_of_inputs = 3; % Number of inputs
-num_of_outputs = 3; % Number of outputs
+num_of_outputs = 6; % Number of outputs
 Nc = 15; % control horizon
 Np = 15; % prediction horizon
 
@@ -93,10 +93,11 @@ if Quad.init == 0
     % 제어 입력(토크)의 크기와 변화율에 대한 물리적 제약 조건을 quadprog가 이해할 수 있는 CC*DeltaU <= dd + dupast*u_past 형태의 행렬로 변환
 
     % --- 비용 함수 가중치 정의 (튜닝 필요!) ---
-    % Qy: 출력(각도) 오차에 대한 가중치. 클수록 목표 각도를 더 정확히 추종.
-    Qy = diag([100, 100, 100]); 
+    % Qx: 출력(각도) 오차에 대한 가중치. 클수록 목표 각도를 더 정확히 추종.
+    % 상태 순서: [φ, φ̇, θ, θ̇, ψ, ψ̇]
+    Qx = diag([1000, 1, 1000, 1, 10, 1]); 
     % Ru: 입력(토크) '변화율'에 대한 가중치. 클수록 제어가 부드러워짐.
-    Ru = diag([1, 1, 1]);
+    Ru = diag([10, 10, 10]);
 
     % quadprog 옵션
     opts = optimoptions('quadprog','Algorithm','active-set','Display','off');
@@ -143,8 +144,10 @@ Quad.U1 = min(Quad.U1_max, max(Quad.U1_min, Quad.U1));
 % a. 현재 상태 및 목표값 읽기
 x_m_current = [Quad.phi; Quad.phi_dot; Quad.theta; Quad.theta_dot; Quad.psi; Quad.psi_dot];
 % x_m_current = [Quad.phi; Quad.p; Quad.theta; Quad.q; Quad.psi; Quad.r];
-% r_current = [Quad.phi_des; 0; Quad.theta_des; 0; Quad.psi_des; 0];
-r_current = [Quad.phi_des; Quad.theta_des; Quad.psi_des];
+r_current = [Quad.phi_des; 0; Quad.theta_des; 0; Quad.psi_des; 0];
+
+% r_current = [phi - Quad.phi_des; Quad.phi_dot - 0; theta - Quad.theta_des; Quad.theta_dot - 0; psi - Quad.psi_des; Quad.psi_dot - 0];
+
 
 % b. QP 문제 구성
 % 증강 상태 벡터 구성
@@ -153,7 +156,7 @@ y_current = Quad.Cm * x_m_current;
 x_aug = [delta_xm; y_current]; % 상태 변화량과 현재 출력을 합쳐 현재의 증강 상태 벡터 x_aug를 만듭니다.
 
 % 비용 함수 구성: min 0.5*x'*H*x + f'*x
-Q_bar = kron(eye(Np), Qy);
+Q_bar = kron(eye(Np), Qx);
 R_bar = kron(eye(Nc), Ru);
 
 H_qp = 2 * (H' *Q_bar* H + R_bar); % E (논문) ↔ H_qp (코드)

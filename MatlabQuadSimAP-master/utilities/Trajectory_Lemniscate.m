@@ -8,9 +8,9 @@ global Quad;
 t = Quad.counter * Quad.Ts;  % Ts는 샘플링 타임 (예: 0.01초)
 
 % 경로 파라미터
-a = 0.5;    % x/y 크기
-b = 0.5;    % z 높이 변화량
-w = 0.1;    % 주기 조절
+a = 1.0;    % x/y 크기
+b = 0.0;    % z 높이 변화량, 0 이면 변화가 없다
+w = 0.2;    % 주기 조절
 
 % 무한대 모양 경로 (lemniscate of Gerono)
 Quad.X_des_GF = a * sin(w * t);

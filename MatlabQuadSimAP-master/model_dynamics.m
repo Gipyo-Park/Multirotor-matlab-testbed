@@ -203,8 +203,8 @@ B_eq = double(subs(LQR_df_du, {phi,phi_dot,theta,theta_dot,psi,psi_dot}, {0, 0, 
 
 % LQR 가중치 설정
 % 상태 순서: [φ, φ̇, θ, θ̇, ψ, ψ̇]
-Q = diag([100,  10,   100,  10,   100,  10]);  
-R = diag([1,   1,    1]);  
+Q = diag([1000,  1,   1000,  1,   10,  1]);  
+R = diag([10,   10,    10]);  
 
 % LQR 이득 계산
 % K_LQR_attitude = lqr(A_eq, B_eq, Q, R);       % LQR 이득
@@ -220,8 +220,8 @@ A_LQI = [A_eq, zeros(6,3);
          C, zeros(3,3)];
 B_LQI = [B_eq;
          zeros(3,3)];
-Q_LQI = diag([100,  10,   100,  10,   100,  10,  10, 10, 10]);  % 상태 + 적분 오차
-R_LQI = diag([1, 1, 1]);
+Q_LQI = diag([1000,  1,   1000,  1,   10,  1,  0.1, 0.1, 0.1]);  % 상태 + 적분 오차
+R_LQI = diag([10, 10, 10]);
 
 % LQI 이득 계산
 K_LQI_attitude = lqrd(A_LQI, B_LQI, Q_LQI, R_LQI, 0.01);
@@ -318,10 +318,12 @@ Bm = jacobian(X_dot,[tau_x; tau_y; tau_z]);
 Quad.Am = double(subs(Am, {phi,phi_dot,theta,theta_dot,psi,psi_dot}, {0, 0, 0, 0, 0, 0}));
 Quad.Bm = double(subs(Bm, {phi,phi_dot,theta,theta_dot,psi,psi_dot}, {0, 0, 0, 0, 0, 0}));
 
-Quad.Cm = [1 0 0 0 0 0;
-      0 0 1 0 0 0;
-      0 0 0 0 1 0];
-Quad.Dm = zeros(3,3);
+% Quad.Cm = [1 0 0 0 0 0;
+%       0 0 1 0 0 0;
+%       0 0 0 0 1 0];
+Quad.Cm = eye(6);
+% Quad.Dm = zeros(3,3);
+Quad.Dm = zeros(6, 3);
 
 % [Ad,Bd,Cd,Dd] = c2dm(Am,Bm,Cm,Dm,0.01); % Converting from Continuous to Discrete Time
 

@@ -103,7 +103,7 @@ Quad.r = 0;        % Initial r value (angular rate rotation about Z BF, radians/
 % Desired variables
 Quad.X_des_GF = 0;         % desired value of X in Global frame
 Quad.Y_des_GF = 0;         % desired value of Y in Global frame
-Quad.Z_des_GF = 1;         % desired value of Z in Global frame
+Quad.Z_des_GF = 0;         % desired value of Z in Global frame
 Quad.X_des = 0;            % desired value of X in Body frame
 Quad.Y_des = 0;            % desired value of Y in Body frame
 Quad.Z_des = 0;            % desired value of Z in Body frame

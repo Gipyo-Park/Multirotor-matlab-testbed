@@ -82,7 +82,7 @@ while Quad.t_plot(Quad.counter-1)< max(Quad.t_plot);
 
     
     % yaw 안 맞추고 Lemniscate 경로 생성
-    % Trajectory_Lemniscate;
+    Trajectory_Lemniscate;
 
 
 
@@ -92,7 +92,9 @@ while Quad.t_plot(Quad.counter-1)< max(Quad.t_plot);
     % attitude_LQR;
     % attitude_LQI;
     % full_LQR;
-    attitude_MPC;
+    % attitude_MPC;
+    attitude_MPC_v1;
+    % attitude_NMPC;
     % attitude_PID;
     % rate_PID;
     
@@ -106,9 +108,9 @@ while Quad.t_plot(Quad.counter-1)< max(Quad.t_plot);
     if(mod(Quad.counter,3)==0)
         plot_quad 
         
-%         campos([A.X+2 A.Y+2 A.Z+2])
-%         camtarget([A.X A.Y A.Z])
-%         camroll(0);
+        % campos([A.X+2 A.Y+2 A.Z+2])
+        % camtarget([A.X A.Y A.Z])
+        % camroll(0);
         Quad.counter;
         drawnow
     end
@@ -119,6 +121,9 @@ end
 %% Plot Data
 plot_data
 
+% Performance Metrics Calculation
+calculate_performance;
+
 % 시뮬 후
 figure();
 plot3(Quad.X_log, Quad.Y_log, Quad.Z_log,'--');
@@ -126,5 +131,5 @@ xlabel('X'), ylabel('Y'), zlabel('Z');
 title('Lemniscate Trajectory');
 grid on;
 hold on;
-% plot3(Quad.X_des_log, Quad.Y_des_log, Quad.Z_des_log);
+plot3(Quad.X_des_log, Quad.Y_des_log, Quad.Z_des_log);
 legend('simulated trajectory', 'reference');

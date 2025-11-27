@@ -58,7 +58,7 @@ xlabel('x')
 
 
 camproj perspective 
-camva(5)
+camva(5.5)
 
 hlight = camlight('headlight'); 
 
