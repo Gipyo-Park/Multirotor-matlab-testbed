@@ -42,7 +42,7 @@ L= 0.56;
 %         ^ x
 %         |
 %         B-->y
-%    
+%
 %   ccw 2   4 cw
 
 % K = [ ct_val,    ct_val,    ct_val,    ct_val;
@@ -51,17 +51,17 @@ L= 0.56;
 %       cq_val,    -cq_val,    cq_val,     -cq_val];
 
 % Quadrotor+
-%            1 ccw 
+%            1 ccw
 %            ^ x
 %            |
 %   cw 4     B-->y    2 cw
-% 
-%            3 ccw 
+%
+%            3 ccw
 
 K = [ ct_val,    ct_val,    ct_val,    ct_val;
-      0,  -ct_val*L, 0, ct_val*L;
-       ct_val*L, 0,  -ct_val*L, 0;
-      cq_val,    -cq_val,    cq_val,     -cq_val];
+    0,  -ct_val*L, 0, ct_val*L;
+    ct_val*L, 0,  -ct_val*L, 0;
+    cq_val,    -cq_val,    cq_val,     -cq_val];
 
 ACS_points_normal = (K * V_box')';          % 정상 조건: [T,L,M,N], (10)식, ACS_points_normal 은 V'_omega이다
 
@@ -76,7 +76,7 @@ trisurf(hull_LMT, pts_LMT(:,1), pts_LMT(:,2), pts_LMT(:,3), ...
 hold on;
 plot3(pts_LMT(:,1), pts_LMT(:,2), pts_LMT(:,3), 'bo','MarkerSize',10);
 plot3(pts_LMT(convexIdx_LMT,1), pts_LMT(convexIdx_LMT,2), pts_LMT(convexIdx_LMT,3), ...
-    'ks','MarkerSize',8,'MarkerFaceColor','r');
+    'ks','MarkerSize',8,'MarkerFaceColor','b');
 xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Thrust T (N)');
 title('Normal ACS: (Roll, Pitch, Thrust)');
 grid on; view(3); camlight; lighting gouraud;
@@ -90,7 +90,7 @@ figure('Name','Normal ACS: Roll, Pitch, Yaw','NumberTitle','off');
 trisurf(hull_LMN, pts_LMN(:,1), pts_LMN(:,2), pts_LMN(:,3), ...
     'FaceColor','magenta','FaceAlpha',0.5,'EdgeColor','k','LineWidth',1.0);
 hold on;
-plot3(pts_LMN(:,1), pts_LMN(:,2), pts_LMN(:,3), 'ro','MarkerSize',10);
+plot3(pts_LMN(:,1), pts_LMN(:,2), pts_LMN(:,3), 'bo','MarkerSize',10);
 plot3(pts_LMN(convexIdx_LMN,1), pts_LMN(convexIdx_LMN,2), pts_LMN(convexIdx_LMN,3), ...
     'ks','MarkerSize',8,'MarkerFaceColor','b');
 xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Yaw Moment N (Nm)');
@@ -159,7 +159,7 @@ else
         hold on;
         plot3(sliceN0_RPT(:,1), sliceN0_RPT(:,2), sliceN0_RPT(:,3), 'bo','MarkerSize',10);
         plot3(sliceN0_RPT(convexIdx_N0,1), sliceN0_RPT(convexIdx_N0,2), sliceN0_RPT(convexIdx_N0,3), ...
-            'ks','MarkerSize',8,'MarkerFaceColor','r');
+            'ks','MarkerSize',8,'MarkerFaceColor','b');
         xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Thrust T (N)');
         title('Normal Slice: N=0 (3D) in (Roll, Pitch, Thrust)');
         grid on; view(3); camlight; lighting gouraud;
@@ -169,7 +169,7 @@ end
 
 %% 9. 정상 슬라이싱: T=mg, N=0 => 2차원 (L,M) 시각화
 % 호버링하면서 드론이 팽이처럼 돌지 않는 기동을 하는 상황
-Aeq_TN = [1 0 0 0; 0 0 0 1]; 
+Aeq_TN = [1 0 0 0; 0 0 0 1];
 beq_TN = [m*g; 0];
 [V_sliceTN, nr_sliceTN, nre_sliceTN] = lcon2vert(A_all_TLMN, b_all_TLMN, Aeq_TN, beq_TN, 1e-10, true);
 if isempty(V_sliceTN)
@@ -182,10 +182,15 @@ else
         [hullTN_LM, vol_TN] = convhulln(sliceTN_LM);
         convexIdx_TN = unique(hullTN_LM);
         figure('Name','Normal Slice: T=mg, N=0 => 2D in (Roll, Pitch)','NumberTitle','off');
-        plot(sliceTN_LM(:,1), sliceTN_LM(:,2), 'bo','MarkerSize',10);
+        % plot(sliceTN_LM(:,1), sliceTN_LM(:,2), 'bo','MarkerSize',10);
+        plot3(sliceTN_LM(:,1), sliceTN_LM(:,2), V_sliceTN(:,1),'bo','MarkerSize',10);
         hold on;
-        plot(sliceTN_LM(hullTN_LM,1), sliceTN_LM(hullTN_LM,2), 'r-','LineWidth',2);
-        plot(sliceTN_LM(convexIdx_TN,1), sliceTN_LM(convexIdx_TN,2), 'ks','MarkerSize',8,'MarkerFaceColor','g');
+        % plot(sliceTN_LM(hullTN_LM,1), sliceTN_LM(hullTN_LM,2), 'r-','LineWidth',2);
+        plot3(sliceTN_LM(hullTN_LM,1), sliceTN_LM(hullTN_LM,2), V_sliceTN(hullTN_LM,1), 'r-','LineWidth',2);
+
+        % plot(sliceTN_LM(convexIdx_TN,1), sliceTN_LM(convexIdx_TN,2), 'ks','MarkerSize',8,'MarkerFaceColor','b');
+        plot3(sliceTN_LM(convexIdx_TN,1), sliceTN_LM(convexIdx_TN,2), V_sliceTN(convexIdx_TN,1), 'ks','MarkerSize',8,'MarkerFaceColor','b');
+
         xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)');
         title('Normal Slice: T=mg, N=0 (2D) in (Roll, Pitch)');
         grid on;
@@ -214,7 +219,7 @@ else
         hold on;
         plot3(sliceT_LMN(:,1), sliceT_LMN(:,2), sliceT_LMN(:,3), 'bo','MarkerSize',10);
         plot3(sliceT_LMN(convexIdx_T,1), sliceT_LMN(convexIdx_T,2), sliceT_LMN(convexIdx_T,3), ...
-            'ks','MarkerSize',8,'MarkerFaceColor','m');
+            'ks','MarkerSize',8,'MarkerFaceColor','b');
         xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Yaw Moment N (Nm)');
         title('Normal Slice: T=mg (3D) in (Roll, Pitch, Yaw)');
         grid on; view(3); camlight; lighting gouraud;
@@ -237,15 +242,15 @@ if is_complete_fault
     all_motors = 1:n;
     faulty_motors = Inject_Fault;
     free_motors = setdiff(all_motors, faulty_motors); % 자유롭게 움직이는 모터
-    
+
     num_free_motors = length(free_motors);
     num_vertices = 2^num_free_motors;
-    
+
     % 2. 자유로운 모터들이 가질 수 있는 min/max 값의 모든 조합을 생성
     min_max_cell = repmat({[w_min_val, w_max_val]}, 1, num_free_motors);
     grids = cell(1, num_free_motors);
     [grids{:}] = ndgrid(min_max_cell{:});
-    
+
     free_motor_vertices = zeros(num_vertices, num_free_motors);
     for i = 1:num_free_motors
         free_motor_vertices(:, i) = grids{i}(:);
@@ -261,7 +266,7 @@ if is_complete_fault
 else
     % --- Fault_Level이 1이 아닐 경우: 기존 lcon2vert 방식 사용 ---
     disp('Fault_Level이 1이 아니므로, 기존 lcon2vert 방식을 사용합니다.');
-    
+
     Aeq_fault = zeros(length(Inject_Fault), n);
     beq_fault = zeros(length(Inject_Fault), 1);
     for i = 1:length(Inject_Fault)
@@ -289,7 +294,7 @@ figure('Name','Faulty ACS: Roll, Pitch, Thrust','NumberTitle','off');
 trisurf(hull_LMT_fault, pts_LMT_fault(:,1), pts_LMT_fault(:,2), pts_LMT_fault(:,3), ...
     'FaceColor','cyan','FaceAlpha',0.5,'EdgeColor','k','LineWidth',1.0);
 hold on;
-plot3(pts_LMT_fault(:,1), pts_LMT_fault(:,2), pts_LMT_fault(:,3), 'bo','MarkerSize',10);
+plot3(pts_LMT_fault(:,1), pts_LMT_fault(:,2), pts_LMT_fault(:,3), 'ro','MarkerSize',10);
 plot3(pts_LMT_fault(convexIdx_LMT_fault,1), pts_LMT_fault(convexIdx_LMT_fault,2), pts_LMT_fault(convexIdx_LMT_fault,3), ...
     'ks','MarkerSize',8,'MarkerFaceColor','r');
 xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Thrust T (N)');
@@ -308,7 +313,7 @@ trisurf(hull_LMN_fault, pts_LMN_fault(:,1), pts_LMN_fault(:,2), pts_LMN_fault(:,
 hold on;
 plot3(pts_LMN_fault(:,1), pts_LMN_fault(:,2), pts_LMN_fault(:,3), 'ro','MarkerSize',10);
 plot3(pts_LMN_fault(convexIdx_LMN_fault,1), pts_LMN_fault(convexIdx_LMN_fault,2), pts_LMN_fault(convexIdx_LMN_fault,3), ...
-    'ks','MarkerSize',8,'MarkerFaceColor','b');
+    'ks','MarkerSize',8,'MarkerFaceColor','r');
 xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Yaw Moment N (Nm)');
 title('Faulty ACS: (Roll, Pitch, Yaw)');
 grid on; view(3); camlight; lighting gouraud;
@@ -354,82 +359,26 @@ else
     disp('data_rank 데이터는 4차원 공간을 모두 채우고 있습니다.');
 end
 
-% try
-    % --- [TRY] 4차원 볼록 껍질 계산을 먼저 시도 ---
-    disp('4차원 Faulty ACS 계산을 시도합니다...');
-    % [hull_TLMN_fault, convex_vol_TLMN_fault] = convhulln(pts_TLMN_fault);
 
-    % convexIdx_TLMN_fault = unique(hull_TLMN_fault);
-    [A_all_TLMN_fault, b_all_TLMN_fault, Aeq_all_TLMN_fault, beq_all_TLMN_fault] = vert2lcon(pts_TLMN_fault, 1e-10);
-    disp('Faulty ACS (T, L, M, N)의 부등식 조건:');
-    disp('Inequality A = '); disp(A_all_TLMN_fault);
-    disp('Inequality b = '); disp(b_all_TLMN_fault);
-    if ~isempty(Aeq_all_TLMN_fault)
-        disp('Faulty Equality 조건:'); 
-        disp('Equality Aeq = '); 
-        disp(Aeq_all_TLMN_fault); 
-        disp('Equality beq = ');
-        disp(beq_all_TLMN_fault);
-    else
-        disp('Faulty Equality 조건은 없습니다.');
-    end
-    
-    % 1. centered_pts 데이터에 PCA를 적용
-    %   coeff: 주성분(새로운 축) 방향 벡터들
-    %   score: 새로운 축을 기준으로 변환된 데이터 좌표
-    %   latent: 각 축의 중요도(분산)
-    [coeff, score, latent] = pca(centered_pts);
 
-    % 2. 가장 중요한 3개의 축(PC1, PC2, PC3)에 해당하는 데이터만 선택
-    %   이것이 바로 '진정한' 3차원 데이터입니다.
-    pts_faulty_pca = score(:, 1:3);
-    
-    % '진짜' 3차원 데이터로 3D convex hull과 3D 부피를 계산
-    [hull_faulty_pca, vol_faulty_pca] = convhulln(pts_faulty_pca);
-    
-    disp('각 주성분의 중요도(분산):');
-    disp(latent);
-    fprintf('4번째 주성분의 분산(latent) 값이 거의 0이므로, 데이터가 3차원임을 확인할 수 있습니다.\n');
-    % 주성분 축의 의미 분석
-    disp('----------------------------------------------------');
-    disp('주성분 축 계수 행렬 (Principal Component Loadings):');
+disp('4차원 Faulty ACS 계산을 시도합니다...');
+% [hull_TLMN_fault, convex_vol_TLMN_fault] = convhulln(pts_TLMN_fault);
+% convexIdx_TLMN_fault = unique(hull_TLMN_fault);
+[A_all_TLMN_fault, b_all_TLMN_fault, Aeq_all_TLMN_fault, beq_all_TLMN_fault] = vert2lcon(pts_TLMN_fault, 1e-10);
+disp('Faulty ACS (T, L, M, N)의 부등식 조건:');
+disp('Inequality A = '); disp(A_all_TLMN_fault);
+disp('Inequality b = '); disp(b_all_TLMN_fault);
+if ~isempty(Aeq_all_TLMN_fault)
+    disp('Faulty Equality 조건:');
+    disp('Equality Aeq = ');
+    disp(Aeq_all_TLMN_fault);
+    disp('Equality beq = ');
+    disp(beq_all_TLMN_fault);
+else
+    disp('Faulty Equality 조건은 없습니다.');
+end
 
-    % 보기 쉬운 테이블 형태로 출력
-    loadings = array2table(coeff(:,1:3), ...  % 3개의 주성분만 확인
-               'VariableNames', {'PC1', 'PC2', 'PC3'}, ...
-                'RowNames', {'Thrust', 'Roll', 'Pitch', 'Yaw'});
-    disp(loadings);
 
-    fprintf('\n* 해석: 각 PC열에서 절댓값이 가장 큰 행이 해당 축의 주된 의미입니다.\n');
-    % ★ 바로 이 값이 우리가 원하는 진짜 3차원 부피입니다.
-    disp('Faulty ACS의 실제 3차원 부피 (PCA 기반):');
-    disp(vol_faulty_pca);
-
-    % disp('Faulty convex_vol_TLMN = '); disp(convex_vol_TLMN_fault);
-% catch ME
-%     % --- [CATCH] 4차원 계산이 실패할 경우 (데이터가 평면일 때) ---
-%     warning('QHULL 오류: 4차원 볼록 껍질 생성에 실패했습니다. 데이터가 3차원 초평면에 있는 것으로 보입니다.');
-%     warning('대신 3차원 (Roll, Pitch, Thrust) 공간에서의 ACS를 계산합니다.');
-% 
-%     % 비상 대책: Roll, Pitch, Thrust 3차원 공간에서 시각화
-%     pts_LMT_fault = ACS_points_fault(:, [2, 3, 1]);  % x=Roll, y=Pitch, z=Thrust
-% 
-%     if size(pts_LMT_fault, 1) >= 4 % 3D 도형을 만들 최소 점 개수 확인
-%         [hull_LMT_fault, convex_vol_LMT_fault] = convhulln(pts_LMT_fault);
-% 
-%         figure('Name','Faulty ACS (3D Fallback Visualization)','NumberTitle','off');
-%         trisurf(hull_LMT_fault, pts_LMT_fault(:,1), pts_LMT_fault(:,2), pts_LMT_fault(:,3), ...
-%             'FaceColor','red','FaceAlpha',0.5,'EdgeColor','k');
-%         xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Thrust T (N)');
-%         title('고장 시 축소된 3D ACS (Roll, Pitch, Thrust)');
-%         grid on; view(3); camlight; lighting gouraud;
-% 
-%         disp('계산된 3차원 Faulty ACS의 부피:');
-%         disp(convex_vol_LMT_fault);
-%     else
-%         disp('3차원 시각화를 위한 점의 개수가 부족합니다.');
-%     end
-% end
 
 
 %% F8. Faulty 슬라이싱: N=0 => 3차원 (T,L,M) 시각화
@@ -442,45 +391,84 @@ beq_combined_N0 = [beq_all_TLMN_fault; beq_N0];
 % beq_combined_N0 = [beq_N0];
 
 [V_sliceN0_fault, nr_sliceN0_fault, nre_sliceN0_fault] = lcon2vert(A_all_TLMN_fault, b_all_TLMN_fault, Aeq_combined_N0, beq_combined_N0, 1e-10, true);
+
 if isempty(V_sliceN0_fault)
     disp('Faulty: N=0 슬라이스가 유효하지 않거나, 점이 없습니다.');
+elseif rank(V_sliceN0_fault - mean(V_sliceN0_fault)) < 2
+    disp('Faulty: N=0 슬라이스에서 점이 너무 적어 2D 도형을 구성할 수 없습니다.');
 else
-    sliceN0_RPT_fault = V_sliceN0_fault(:, [2,3,1]);  % x=Roll, y=Pitch, z=Thrust
+    % 1. 데이터 중심화
+    mean_slice_N0 = mean(V_sliceN0_fault, 1);
+    centered_slice_N0 = V_sliceN0_fault - mean_slice_N0;
 
-    if size(sliceN0_RPT_fault,1) < 3
-        disp('Faulty: N=0 슬라이스에서 점이 너무 적습니다.');
+    % 2. SVD를 이용해 '진정한' 2차원 공간의 기저(basis) 찾기,  SVD를 적용하여 주축(V)과 특이값(S) 찾기
+    [U_N0,S_N0,V_N0] = svd(centered_slice_N0, 'econ');
+
+    fprintf('\n----------------------------------------------------\n');
+    disp('SVD 분석 결과:');
+    disp('특이값 (Singular Values):');
+    disp(diag(S_N0)');
+    fprintf('3번째 특이값이 거의 0이므로, 데이터가 2차원 초평면에 있음을 확인합니다.\n');
+
+    basis_2D_N0 = V_N0(:, 1:2); % 4x2 회전 행렬
+
+    % 3. 4D 데이터를 새로운 2D Local 좌표계로 변환 (회전)
+    pts_2D_projected_N0 = centered_slice_N0 * basis_2D_N0;
+
+    % 4. '진정한' 2D 데이터로 Local 좌표계에서의 H-representation 계산
+    % 이 단계에서 2차원 공간에서의 부등식(A_local * x_local <= b_local)을 구합니다.
+    [A_local_N0, b_local_N0, Aeq_local_N0, beq_local_N0] = vert2lcon(pts_2D_projected_N0,1e-10);
+    disp('Faulty ACS 2D N=0 의 부등식 조건:');
+    disp('Inequality A = '); disp(A_local_N0);
+    disp('Inequality b = '); disp(b_local_N0);
+    if ~isempty(Aeq_local_N0)
+        disp('Faulty Equality 조건:');
+        disp('Equality Aeq = ');
+        disp(Aeq_local_N0);
+        disp('Equality beq = ');
+        disp(beq_local_N0);
     else
-         try
-             [hullN0_RPT_fault, vol_N0_fault] = convhulln(sliceN0_RPT_fault);
-             convexIdx_N0_fault = unique(hullN0_RPT_fault);
-             figure('Name','Faulty Slice: N=0 => 3D in (Roll, Pitch, Thrust)','NumberTitle','off');
-             trisurf(hullN0_RPT_fault, sliceN0_RPT_fault(:,1), sliceN0_RPT_fault(:,2), sliceN0_RPT_fault(:,3), ...
-                 'FaceColor','green','FaceAlpha',0.5,'EdgeColor','k','LineWidth',1.0);
-             hold on;
-             plot3(sliceN0_RPT_fault(:,1), sliceN0_RPT_fault(:,2), sliceN0_RPT_fault(:,3), 'bo','MarkerSize',10);
-             plot3(sliceN0_RPT_fault(convexIdx_N0_fault,1), sliceN0_RPT_fault(convexIdx_N0_fault,2), sliceN0_RPT_fault(convexIdx_N0_fault,3), ...
-                 'ks','MarkerSize',8,'MarkerFaceColor','r');
-             xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Thrust T (N)');
-             title('Faulty Slice: N=0 (3D) in (Roll, Pitch, Thrust)');
-             grid on; view(3); camlight; lighting gouraud;
-             disp('Faulty convex_vol_N0 (for N=0 slice) = '); disp(vol_N0_fault);
-             
-         catch
-            % 3D Hull이 실패하면, 데이터가 2D 평면이라고 간주하고 2D로 시각화합니다.
-            warning('3D convex hull 실패. 데이터가 2D 평면으로 추정되어 2D로 시각화합니다.');
-            
-            % Roll-Pitch 평면에 대해 2D convex hull을 계산합니다.
-            k_2D = convhull(sliceN0_RPT_fault(:,1), sliceN0_RPT_fault(:,2));
-            
-            figure('Name','Faulty Slice: N=0 => 2D Visualization','NumberTitle','off');
-            plot(sliceN0_RPT_fault(:,1), sliceN0_RPT_fault(:,2), 'bo', 'MarkerFaceColor', 'b');
-            hold on;
-            plot(sliceN0_RPT_fault(k_2D, 1), sliceN0_RPT_fault(k_2D, 2), 'r-', 'LineWidth', 2);
-            title('Faulty Slice: N=0 (2D View on Roll-Pitch Plane)');
-            xlabel('Roll Moment (Nm)'); ylabel('Pitch Moment (Nm)');
-            grid on; axis equal;
-         end
+        disp('Faulty ACS 2D N=0 의 Equality 조건은 없습니다.');
     end
+
+    % 5. [핵심] Local 제약조건을 다시 4D Physical 좌표계로 '역변환'
+    % 관계식: x_local = basis_2D' * (x_physical - mean_slice')
+    % A_local * x_local <= b_local  ==>  A_local * basis_2D' * (x_physical - mean_slice') <= b_local
+    A_physical_N0 = A_local_N0 * basis_2D_N0';
+    b_physical_N0 = b_local_N0 + (A_local_N0 * basis_2D_N0') * mean_slice_N0';
+
+    disp('--- Local 제약조건을 다시 4D Physical 좌표계로 역변환한, N=0 슬라이스에 대한 물리적 제약조건 ---');
+    disp('Physical Inequality A = '); disp(A_physical_N0);
+    disp('Physical Inequality b = '); disp(b_physical_N0);
+
+    % 6. 시각화를 위해 경계 꼭짓점들을 다시 4D 물리 좌표로 역변환
+    [hull_N0_2D_fault, vol_N0_2D_fault] = convhulln(pts_2D_projected_N0);
+    convexIdx_N0_fault = unique(hull_N0_2D_fault);
+    hull_vertices_2D_N0 = pts_2D_projected_N0(convexIdx_N0_fault, :);
+
+    % 2. 2D 좌표를 이용해 '들로네 삼각분할'로 면 정보를 생성합니다.
+    %    이것이 바로 점의 개수에 상관없이 항상 올바른 '면 설계도'입니다.
+    triangulation_faces_N0 = delaunay(pts_2D_projected_N0(:,1), pts_2D_projected_N0(:,2));
+
+
+    % hull_vertices_4D_physical_N0 는 결국 V_sliceN0_fault 이거랑 같다
+    hull_vertices_4D_physical_N0 = hull_vertices_2D_N0 * basis_2D_N0' + mean_slice_N0;
+    fprintf('\n실제 2D ACS를 구성하는 꼭짓점들의 4D 물리 좌표 {T, L, M, N}:\n');
+    disp(hull_vertices_4D_physical_N0);
+
+
+    figure('Name','Faulty Slice: N=0 => 3D in (Roll, Pitch, Thrust)','NumberTitle','off');
+    trisurf(triangulation_faces_N0, hull_vertices_4D_physical_N0(:,2), hull_vertices_4D_physical_N0(:,3), hull_vertices_4D_physical_N0(:,1), ...
+        'FaceColor','green','FaceAlpha',0.5,'EdgeColor','k','LineWidth',1.0);
+    hold on;
+    plot3(hull_vertices_4D_physical_N0(:,2), hull_vertices_4D_physical_N0(:,3), hull_vertices_4D_physical_N0(:,1), 'ro','MarkerSize',10);
+    plot3(hull_vertices_4D_physical_N0(convexIdx_N0_fault,2), hull_vertices_4D_physical_N0(convexIdx_N0_fault,3), hull_vertices_4D_physical_N0(convexIdx_N0_fault,1), ...
+        'ks','MarkerSize',8,'MarkerFaceColor','r');
+    xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Thrust T (N)');
+    title('Faulty Slice: N=0 (3D) in (Roll, Pitch, Thrust)');
+    grid on; view(3); camlight; lighting gouraud;
+    disp('Faulty vol_N0_2D_fault = '); disp(vol_N0_2D_fault);
+
 end
 
 %% F9. Faulty 슬라이싱: T=mg, N=0 => 2차원 (L,M) 시각화
@@ -493,58 +481,159 @@ beq_combined_TN = [beq_all_TLMN_fault; beq_TN];
 % beq_combined_TN = [beq_TN];
 
 [V_sliceTN_fault, nr_sliceTN_fault, nre_sliceTN_fault] = lcon2vert(A_all_TLMN_fault, b_all_TLMN_fault, Aeq_combined_TN, beq_combined_TN, 1e-10, true);
+
 if isempty(V_sliceTN_fault)
     disp('Faulty: T=mg, N=0 슬라이스가 유효하지 않거나, 점이 없습니다.');
+elseif rank(V_sliceTN_fault - mean(V_sliceTN_fault)) < 1
+    disp('Faulty: T=mg, N=0 슬라이스에서 점이 너무 적어 1D를 구성할 수 없습니다.');
 else
-    sliceTN_LM_fault = V_sliceTN_fault(:, [2,3]);  % (L,M)
-    if size(sliceTN_LM_fault,1) < 3
-        disp('Faulty: T=mg, N=0 슬라이스에서 점이 너무 적습니다.');
+    % 1. 데이터 중심화
+    mean_slice_TN = mean(V_sliceTN_fault, 1);
+    centered_slice_TN = V_sliceTN_fault - mean_slice_TN;
+
+    % 2. SVD를 이용해 '진정한' 1차원 공간의 기저(basis) 찾기,  SVD를 적용하여 주축(V)과 특이값(S) 찾기
+    [U_T,S_TN,V_TN] = svd(centered_slice_TN, 'econ');
+
+    fprintf('\n----------------------------------------------------\n');
+    disp('SVD 분석 결과:');
+    disp('특이값 (Singular Values):');
+    disp(diag(S_TN)');
+    fprintf('2번째 특이값이 거의 0이므로, 데이터가 1차원 초평면에 있음을 확인합니다.\n');
+
+    basis_1D_TN = V_TN(:, 1); % 4x1 회전 행렬
+
+    % 3. 4D 데이터를 새로운 1D Local 좌표계로 변환 (회전)
+    pts_1D_projected_TN = centered_slice_TN * basis_1D_TN;
+
+    % 4. '진정한' 1D 데이터로 Local 좌표계에서의 H-representation 계산
+    % 이 단계에서 1차원 공간에서의 부등식(A_local * x_local <= b_local)을 구합니다.
+    [A_local_TN, b_local_TN, Aeq_local_TN, beq_local_TN] = vert2lcon(pts_1D_projected_TN,1e-10);
+    disp('Faulty ACS 1D N=0 의 부등식 조건:');
+    disp('Inequality A = '); disp(A_local_TN);
+    disp('Inequality b = '); disp(b_local_TN);
+    if ~isempty(Aeq_local_TN)
+        disp('Faulty Equality 조건:');
+        disp('Equality Aeq = ');
+        disp(Aeq_local_TN);
+        disp('Equality beq = ');
+        disp(beq_local_TN);
     else
-        [hullTN_LM_fault, vol_TN_fault] = convhulln(sliceTN_LM_fault);
-        convexIdx_TN_fault = unique(hullTN_LM_fault);
-        figure('Name','Faulty Slice: T=mg, N=0 => 2D in (Roll, Pitch)','NumberTitle','off');
-        plot(sliceTN_LM_fault(:,1), sliceTN_LM_fault(:,2), 'bo','MarkerSize',10);
-        hold on;
-        plot(sliceTN_LM_fault(hullTN_LM_fault,1), sliceTN_LM_fault(hullTN_LM_fault,2), 'r-','LineWidth',2);
-        plot(sliceTN_LM_fault(convexIdx_TN_fault,1), sliceTN_LM_fault(convexIdx_TN_fault,2), 'ks','MarkerSize',8,'MarkerFaceColor','g');
-        xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)');
-        title('Faulty Slice: T=mg, N=0 (2D) in (Roll, Pitch)');
-        grid on;
-        disp('Faulty convex_vol_TN (for T=mg, N=0 slice) = '); disp(vol_TN_fault);
+        disp('Faulty ACS 1D N=0 의 Equality 조건은 없습니다.');
     end
+
+    % 5. [핵심] Local 제약조건을 다시 4D Physical 좌표계로 '역변환'
+    % 관계식: x_local = basis_1D' * (x_physical - mean_slice')
+    % A_local * x_local <= b_local  ==>  A_local * basis_1D' * (x_physical - mean_slice') <= b_local
+    A_physical_TN = A_local_TN * basis_1D_TN';
+    b_physical_TN = b_local_TN + (A_local_TN * basis_1D_TN') * mean_slice_TN';
+
+    disp('--- Local 제약조건을 다시 4D Physical 좌표계로 역변환한, T=mg N=0 슬라이스에 대한 물리적 제약조건 ---');
+    disp('Physical Inequality A = '); disp(A_physical_TN);
+    disp('Physical Inequality b = '); disp(b_physical_TN);
+
+    min_val_1D = min(pts_1D_projected_TN);
+    max_val_1D = max(pts_1D_projected_TN);
+    vol_TN_1D_fault = max_val_1D - min_val_1D; % 이것이 1D 부피, 즉 길이입니다.
+
+    % 1D 볼록 껍질의 꼭짓점은 최소값과 최대값 두 개입니다.
+    hull_vertices_1D_TN = [min_val_1D; max_val_1D];
+
+
+    % hull_vertices_4D_physical 는 결국 V_sliceTN_fault 이거랑 같다
+    hull_vertices_4D_physical_TN = hull_vertices_1D_TN * basis_1D_TN' + mean_slice_TN;
+    fprintf('\n실제 1D ACS를 구성하는 꼭짓점들의 4D 물리 좌표 {T, L, M, N}:\n');
+    disp(hull_vertices_4D_physical_TN);
+
+
+    figure('Name','Faulty Slice: T=mg, N=0 => 1D in (Roll, Pitch, Thrust)','NumberTitle','off');
+    plot3(hull_vertices_4D_physical_TN(:,2), hull_vertices_4D_physical_TN(:,3), hull_vertices_4D_physical_TN(:,1), ...
+        'LineWidth',1.0);
+    hold on;
+    plot3(hull_vertices_4D_physical_TN(:,2), hull_vertices_4D_physical_TN(:,3), hull_vertices_4D_physical_TN(:,1), 'ro','MarkerSize',10);
+    plot3(hull_vertices_4D_physical_TN(:,2), hull_vertices_4D_physical_TN(:,3), hull_vertices_4D_physical_TN(:,1), ...
+        'ks','MarkerSize',8,'MarkerFaceColor','r');
+    xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Thrust T (N)');
+    title('Faulty Slice: T=mg, N=0 (3D) in (Roll, Pitch, Thrust)');
+    grid on; view(3); camlight; lighting gouraud;
+    disp('Faulty vol_TN_1D_fault = '); disp(vol_TN_1D_fault);
+
 end
 
 %% F10. Faulty 슬라이싱: T=mg => 3차원 (L,M,N) 시각화
-Aeq_T = [1 0 0 0]; beq_T = m*g;
 
-% 데이터 고유의 등식 제약과 슬라이싱 조건을 합칩니다.
+% --- 슬라이싱 조건 정의 ---
+Aeq_T = [1 0 0 0];
+beq_T = m*g;
+
+% --- 데이터 고유의 등식 제약과 슬라이싱 조건을 반드시 합쳐야 합니다 ---
 Aeq_combined_T = [Aeq_all_TLMN_fault; Aeq_T];
 beq_combined_T = [beq_all_TLMN_fault; beq_T];
 % Aeq_combined_T = [Aeq_T];
 % beq_combined_T = [beq_T];
 
+% 합쳐진 등식 제약으로 슬라이스의 꼭짓점을 계산합니다.
 [V_sliceT_fault, nr_sliceT_fault, nre_sliceT_fault] = lcon2vert(A_all_TLMN_fault, b_all_TLMN_fault, Aeq_combined_T, beq_combined_T, 1e-10, true);
+
 if isempty(V_sliceT_fault)
     disp('Faulty: T=mg 슬라이스가 유효하지 않거나, 점이 없습니다.');
+elseif rank(V_sliceT_fault - mean(V_sliceT_fault)) < 2
+    disp('Faulty: T=mg 슬라이스에서 점이 너무 적어 2D 도형을 구성할 수 없습니다.');
 else
-    sliceT_LMN_fault = V_sliceT_fault(:, [2,3,4]);  % (L,M,N)
-    if size(sliceT_LMN_fault,1) < 4
-        disp('Faulty: T=mg 슬라이스에서 점이 너무 적습니다.');
-    else
-        [hullT_LMN_fault, vol_T_fault] = convhulln(sliceT_LMN_fault);
-        convexIdx_T_fault = unique(hullT_LMN_fault);
-        figure('Name','Faulty Slice: T=mg => 3D in (Roll, Pitch, Yaw)','NumberTitle','off');
-        trisurf(hullT_LMN_fault, sliceT_LMN_fault(:,1), sliceT_LMN_fault(:,2), sliceT_LMN_fault(:,3), ...
-            'FaceColor','yellow','FaceAlpha',0.5,'EdgeColor','k','LineWidth',1.0);
-        hold on;
-        plot3(sliceT_LMN_fault(:,1), sliceT_LMN_fault(:,2), sliceT_LMN_fault(:,3), 'bo','MarkerSize',10);
-        plot3(sliceT_LMN_fault(convexIdx_T_fault,1), sliceT_LMN_fault(convexIdx_T_fault,2), sliceT_LMN_fault(convexIdx_T_fault,3), ...
-            'ks','MarkerSize',8,'MarkerFaceColor','m');
-        xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Yaw Moment N (Nm)');
-        title('Faulty Slice: T=mg (3D) in (Roll, Pitch, Yaw)');
-        grid on; view(3); camlight; lighting gouraud;
-        disp('Faulty convex_vol_T (for T=mg slice) = '); disp(vol_T_fault);
-    end
+    % --- SVD를 이용한 '진정한 2D' 분석 및 시각화 ---
+
+    % 1. 데이터 중심화
+    mean_slice_T = mean(V_sliceT_fault, 1);
+    centered_slice_T = V_sliceT_fault - mean_slice_T;
+
+    % 2. SVD를 이용해 '진정한' 2차원 공간의 기저(basis) 찾기
+    [U_T, S_T, V_T] = svd(centered_slice_T, 'econ');
+
+    fprintf('\n----------------------------------------------------\n');
+    disp('T=mg Slice SVD 분석 결과:');
+    disp('특이값 (Singular Values):');
+    disp(diag(S_T)');
+    fprintf('3번째 이후 특이값이 거의 0이므로, 데이터가 2차원 평면임을 확인합니다.\n');
+
+    basis_2D_T = V_T(:, 1:2); % 4x2 회전 행렬 (새로운 2D 공간의 축)
+
+    % 3. 4D 데이터를 새로운 2D Local 좌표계로 변환 (투영)
+    pts_2D_projected_T = centered_slice_T * basis_2D_T;
+
+    % 4. '진정한' 2D 데이터로 면적과 경계(hull) 계산
+    %    2D 데이터이므로 convhull을 사용하고, 두 번째 출력값으로 면적을 바로 얻습니다.
+    [hull_T_2D_fault, vol_T_2D_fault] = convhulln(pts_2D_projected_T);
+    convexIdx_T_fault = unique(hull_T_2D_fault);
+    hull_vertices_2D_T = pts_2D_projected_T(convexIdx_T_fault, :);
+
+    % 6. 들로네 삼각분할을 이용해 면 정보 생성 및 3D (L,M,N) 공간에 시각화
+    triangulation_faces_T = delaunay(pts_2D_projected_T(:,1), pts_2D_projected_T(:,2));
+
+    % 5. 시각화를 위해 2D 경계 꼭짓점들을 다시 4D 물리 좌표로 역변환
+    hull_vertices_4D_physical_T = hull_vertices_2D_T * basis_2D_T' + mean_slice_T;
+    fprintf('\n실제 2D ACS(T=mg)를 구성하는 꼭짓점들의 4D 물리 좌표 {T, L, M, N}:\n');
+    disp(hull_vertices_4D_physical_T);
+
+
+
+    figure('Name','Faulty Slice: T=mg => 3D in (Roll, Pitch, Yaw)','NumberTitle','off');
+    trisurf(triangulation_faces_T, hull_vertices_4D_physical_T(:,2), hull_vertices_4D_physical_T(:,3), hull_vertices_4D_physical_T(:,4), ...
+        'FaceColor','yellow','FaceAlpha',0.5,'EdgeColor','k');
+    % 참고: trisurf의 좌표 순서를 (L, M, N)으로 맞추기 위해 2,3,4열을 사용했습니다.
+
+    hold on;
+    plot3(hull_vertices_4D_physical_T(:,2), hull_vertices_4D_physical_T(:,3), hull_vertices_4D_physical_T(:,4), 'ro','MarkerSize',10);
+    plot3(hull_vertices_4D_physical_T(convexIdx_T_fault,2), hull_vertices_4D_physical_T(convexIdx_T_fault,3), hull_vertices_4D_physical_T(convexIdx_T_fault,4), ...
+        'ks','MarkerSize',8,'MarkerFaceColor','r');
+
+
+    xlabel('Roll Moment L (Nm)');
+    ylabel('Pitch Moment M (Nm)');
+    zlabel('Yaw Moment N (Nm)');
+    title('Faulty Slice: T=mg (3D) in (Roll, Pitch, Yaw)');
+    grid on; view(3); camlight; lighting gouraud;
+
+    disp('Faulty vol_T_2D_fault = ');
+    disp(vol_T_2D_fault);
 end
 
 
@@ -552,134 +641,111 @@ end
 %% (C) Combined 그래프 5개 (정상 + 고장: 등식 방식)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% 먼저 정상 조건 변수들 재정의
-pts_LMT_normal = ACS_points_normal(:, [2,3,1]);  % Roll, Pitch, Thrust
-[hull_LMT_normal, vol_LMT_normal] = convhulln(pts_LMT_normal);
-convexIdx_LMT_normal = unique(hull_LMT_normal);
-
-pts_LMN_normal = ACS_points_normal(:, [2,3,4]);   % Roll, Pitch, Yaw
-[hull_LMN_normal, vol_LMN_normal] = convhulln(pts_LMN_normal);
-convexIdx_LMN_normal = unique(hull_LMN_normal);
-
-pts_TLMN_normal = ACS_points_normal;              % [T,L,M,N]
-[A_all_TLMN_normal, b_all_TLMN_normal, Aeq_all_TLMN_normal, beq_all_TLMN_normal] = vert2lcon(pts_TLMN_normal, 1e-10);
-
-% 고장 조건 변수들
-pts_LMT_fault = ACS_points_fault(:, [2,3,1]);  % Roll, Pitch, Thrust
-[hull_LMT_fault, vol_LMT_fault] = convhulln(pts_LMT_fault);
-convexIdx_LMT_fault = unique(hull_LMT_fault);
-
-pts_LMN_fault = ACS_points_fault(:, [2,3,4]);  % Roll, Pitch, Yaw
-[hull_LMN_fault, vol_LMN_fault] = convhulln(pts_LMN_fault);
-convexIdx_LMN_fault = unique(hull_LMN_fault);
-
-pts_TLMN_fault = ACS_points_fault;             % [T,L,M,N]
-[A_all_TLMN_fault, b_all_TLMN_fault, Aeq_all_TLMN_fault, beq_all_TLMN_fault] = vert2lcon(pts_TLMN_fault, 1e-10);
-
 % Combined Graphs
 
 %% C1) Combined ACS: (Roll, Pitch, Thrust)
 figure('Name','(C1) Combined: Roll, Pitch, Thrust','NumberTitle','off');
 hold on;
 % 정상
-trisurf(hull_LMT_normal, pts_LMT_normal(:,1), pts_LMT_normal(:,2), pts_LMT_normal(:,3), ...
-    'FaceColor','cyan','FaceAlpha',0.3,'EdgeColor','none');
-plot3(pts_LMT_normal(:,1), pts_LMT_normal(:,2), pts_LMT_normal(:,3), 'bo','MarkerSize',10);
+trisurf(hull_LMT, pts_LMT(:,1), pts_LMT(:,2), pts_LMT(:,3), ...
+    'FaceColor','cyan','FaceAlpha',0.3,'EdgeColor','b','LineStyle','-');
+plot3(pts_LMT(:,1), pts_LMT(:,2), pts_LMT(:,3), 'bo','MarkerSize',10);
+plot3(pts_LMT(convexIdx_LMT,1), pts_LMT(convexIdx_LMT,2), pts_LMT(convexIdx_LMT,3), ...
+    'ks','MarkerSize',8,'MarkerFaceColor','none');
 % 고장
 trisurf(hull_LMT_fault, pts_LMT_fault(:,1), pts_LMT_fault(:,2), pts_LMT_fault(:,3), ...
-    'FaceColor','magenta','FaceAlpha',0.3,'EdgeColor','none');
-plot3(pts_LMT_fault(:,1), pts_LMT_fault(:,2), pts_LMT_fault(:,3), 'ro','MarkerSize',10);
+    'FaceColor','magenta','FaceAlpha',0.3,'EdgeColor','r','LineStyle','--');
+plot3(pts_LMT_fault(:,1), pts_LMT_fault(:,2), pts_LMT_fault(:,3), 'ro','MarkerSize',12);
+plot3(pts_LMT_fault(convexIdx_LMT_fault,1), pts_LMT_fault(convexIdx_LMT_fault,2), pts_LMT_fault(convexIdx_LMT_fault,3), ...
+    'k+','MarkerSize',6,'MarkerFaceColor','none');
 xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Thrust T (N)');
 title('(C1) Combined ACS: (Roll, Pitch, Thrust)');
 grid on; view(3); camlight; lighting gouraud;
-legend('Normal surface','Normal pts','Faulty surface','Faulty pts','Location','best');
+legend('Normal surface','Normal pts','Normal convhull pts','Faulty surface','Faulty pts','Faulty convhull pts','Location','best');
 
 %% C2) Combined ACS: (Roll, Pitch, Yaw)
 figure('Name','(C2) Combined: Roll, Pitch, Yaw','NumberTitle','off');
 hold on;
 % 정상
-trisurf(hull_LMN_normal, pts_LMN_normal(:,1), pts_LMN_normal(:,2), pts_LMN_normal(:,3), ...
-    'FaceColor','cyan','FaceAlpha',0.3,'EdgeColor','none');
-plot3(pts_LMN_normal(:,1), pts_LMN_normal(:,2), pts_LMN_normal(:,3), 'bo','MarkerSize',10);
+trisurf(hull_LMN, pts_LMN(:,1), pts_LMN(:,2), pts_LMN(:,3), ...
+    'FaceColor','cyan','FaceAlpha',0.3,'EdgeColor','b','LineStyle','-');
+plot3(pts_LMN(:,1), pts_LMN(:,2), pts_LMN(:,3), 'bo','MarkerSize',10);
+plot3(pts_LMN(convexIdx_LMN,1), pts_LMN(convexIdx_LMN,2), pts_LMN(convexIdx_LMN,3), ...
+    'ks','MarkerSize',8,'MarkerFaceColor','none');
 % 고장
 trisurf(hull_LMN_fault, pts_LMN_fault(:,1), pts_LMN_fault(:,2), pts_LMN_fault(:,3), ...
-    'FaceColor','magenta','FaceAlpha',0.3,'EdgeColor','none');
-plot3(pts_LMN_fault(:,1), pts_LMN_fault(:,2), pts_LMN_fault(:,3), 'ro','MarkerSize',10);
+    'FaceColor','magenta','FaceAlpha',0.3,'EdgeColor','r','LineStyle','--');
+plot3(pts_LMN_fault(:,1), pts_LMN_fault(:,2), pts_LMN_fault(:,3), 'ro','MarkerSize',12);
+plot3(pts_LMN_fault(convexIdx_LMN_fault,1), pts_LMN_fault(convexIdx_LMN_fault,2), pts_LMN_fault(convexIdx_LMN_fault,3), ...
+    'k+','MarkerSize',6,'MarkerFaceColor','none');
 xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Yaw Moment N (Nm)');
 title('(C2) Combined ACS: (Roll, Pitch, Yaw)');
 grid on; view(3); camlight; lighting gouraud;
-legend('Normal surface','Normal pts','Faulty surface','Faulty pts','Location','best');
+legend('Normal surface','Normal pts','Normal convhull pts','Faulty surface','Faulty pts','Faulty convhull pts','Location','best');
 
 %% C3) Combined Slice: N=0 => 3D (T,L,M)
-Aeq_N0 = [0 0 0 1]; beq_N0 = 0;
-[V_sliceN0_normal, ~, ~] = lcon2vert(A_all_TLMN_normal, b_all_TLMN_normal, Aeq_N0, beq_N0, 1e-10, true);
-[V_sliceN0_fault, ~, ~]  = lcon2vert(A_all_TLMN_fault, b_all_TLMN_fault, Aeq_N0, beq_N0, 1e-10, true);
 figure('Name','(C3) Combined Slice: N=0 => 3D (T,L,M)','NumberTitle','off');
 hold on;
-if ~isempty(V_sliceN0_normal)
-    ptsN0_norm = V_sliceN0_normal(:, [2,3,1]);  % x=Roll, y=Pitch, z=Thrust
-    [hullN0_norm, volN0_norm] = convhulln(ptsN0_norm);
-    trisurf(hullN0_norm, ptsN0_norm(:,1), ptsN0_norm(:,2), ptsN0_norm(:,3), ...
-        'FaceColor','cyan','FaceAlpha',0.3,'EdgeColor','none');
-    plot3(ptsN0_norm(:,1), ptsN0_norm(:,2), ptsN0_norm(:,3), 'bo','MarkerSize',10);
-end
-if ~isempty(V_sliceN0_fault)
-    ptsN0_faul = V_sliceN0_fault(:, [2,3,1]);
-    [hullN0_faul, volN0_faul] = convhulln(ptsN0_faul);
-    trisurf(hullN0_faul, ptsN0_faul(:,1), ptsN0_faul(:,2), ptsN0_faul(:,3), ...
-        'FaceColor','magenta','FaceAlpha',0.3,'EdgeColor','none');
-    plot3(ptsN0_faul(:,1), ptsN0_faul(:,2), ptsN0_faul(:,3), 'ro','MarkerSize',10);
-end
-xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Thrust T (N)');
-title('(C3) Combined Slice: N=0 => (T,L,M)');
-grid on; view(3); camlight; lighting gouraud;
-legend('Normal surface','Normal pts','Faulty surface','Faulty pts','Location','best');
 
-%% C4) Combined Slice: T=mg, N=0 => 2D (L,M)
-Aeq_TN = [1 0 0 0; 0 0 0 1]; 
-beq_TN = [m*g; 0];
-[V_sliceTN_normal, ~, ~] = lcon2vert(A_all_TLMN_normal, b_all_TLMN_normal, Aeq_TN, beq_TN, 1e-10, true);
-[V_sliceTN_fault, ~, ~]  = lcon2vert(A_all_TLMN_fault, b_all_TLMN_fault, Aeq_TN, beq_TN, 1e-10, true);
-figure('Name','(C4) Combined Slice: T=mg, N=0 => 2D (L,M)','NumberTitle','off');
+%정상
+trisurf(hullN0_RPT, sliceN0_RPT(:,1), sliceN0_RPT(:,2), sliceN0_RPT(:,3), ...
+    'FaceColor','cyan','FaceAlpha',0.3,'EdgeColor','b','LineStyle','-');
+plot3(sliceN0_RPT(:,1), sliceN0_RPT(:,2), sliceN0_RPT(:,3), 'bo','MarkerSize',10);
+plot3(sliceN0_RPT(convexIdx_N0,1), sliceN0_RPT(convexIdx_N0,2), sliceN0_RPT(convexIdx_N0,3), ...
+    'ks','MarkerSize',8,'MarkerFaceColor','none');
+
+%고장
+trisurf(triangulation_faces_N0, hull_vertices_4D_physical_N0(:,2), hull_vertices_4D_physical_N0(:,3), hull_vertices_4D_physical_N0(:,1), ...
+    'FaceColor','magenta','FaceAlpha',0.3,'EdgeColor','r','LineStyle','--');
+plot3(hull_vertices_4D_physical_N0(:,2), hull_vertices_4D_physical_N0(:,3), hull_vertices_4D_physical_N0(:,1), 'ro','MarkerSize',12);
+plot3(hull_vertices_4D_physical_N0(convexIdx_N0_fault,2), hull_vertices_4D_physical_N0(convexIdx_N0_fault,3), hull_vertices_4D_physical_N0(convexIdx_N0_fault,1), ...
+    'k+','MarkerSize',6,'MarkerFaceColor','none');
+
+xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Thrust T (N)');
+title('(C3) Combined Slice: N=0 => (Roll, Pitch, Thrust)');
+grid on; view(3); camlight; lighting gouraud;
+legend('Normal surface','Normal pts','Normal convhull pts','Faulty surface','Faulty pts','Faulty convhull pts','Location','best');
+
+%% C4) Combined Slice: T=mg, N=0 => 3D (L,M)
+figure('Name','(C4) Combined Slice: T=mg, N=0 => 3D (L,M)','NumberTitle','off');
 hold on;
-if ~isempty(V_sliceTN_normal)
-    ptsTN_norm = V_sliceTN_normal(:, [2,3]);
-    [hullTN_norm, volTN_norm] = convhulln(ptsTN_norm);
-    plot(ptsTN_norm(:,1), ptsTN_norm(:,2), 'bo','MarkerSize',10);
-    plot(ptsTN_norm(hullTN_norm,1), ptsTN_norm(hullTN_norm,2), 'b-','LineWidth',2);
-end
-if ~isempty(V_sliceTN_fault)
-    ptsTN_faul = V_sliceTN_fault(:, [2,3]);
-    [hullTN_faul, volTN_faul] = convhulln(ptsTN_faul);
-    plot(ptsTN_faul(:,1), ptsTN_faul(:,2), 'ro','MarkerSize',10);
-    plot(ptsTN_faul(hullTN_faul,1), ptsTN_faul(hullTN_faul,2), 'r-','LineWidth',2);
-end
-xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)');
-title('(C4) Combined Slice: T=mg, N=0 => (L,M)');
-grid on;
-legend('Normal pts','Normal hull','Faulty pts','Faulty hull','Location','best');
+%정상
+
+plot3(sliceTN_LM(hullTN_LM,1), sliceTN_LM(hullTN_LM,2), V_sliceTN(hullTN_LM,1),'-b');
+plot3(sliceTN_LM(:,1), sliceTN_LM(:,2), V_sliceTN(:,1),'bo','MarkerSize',10);
+plot3(sliceTN_LM(convexIdx_TN,1), sliceTN_LM(convexIdx_TN,2), V_sliceTN(convexIdx_TN,1), 'ks','MarkerSize',8,'MarkerFaceColor','none');
+
+%고장
+plot3(hull_vertices_4D_physical_TN(:,2), hull_vertices_4D_physical_TN(:,3), hull_vertices_4D_physical_TN(:,1), '--r');
+plot3(hull_vertices_4D_physical_TN(:,2), hull_vertices_4D_physical_TN(:,3), hull_vertices_4D_physical_TN(:,1), 'ro','MarkerSize',12);
+plot3(hull_vertices_4D_physical_TN(:,2), hull_vertices_4D_physical_TN(:,3), hull_vertices_4D_physical_TN(:,1), ...
+    'k+','MarkerSize',6,'MarkerFaceColor','none');
+
+
+xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Thrust T (N)');
+title('(C4) Combined Slice: T=mg, N=0 => (Roll, Pitch)');
+grid on; view(3); camlight; lighting gouraud;
+legend('Normal surface','Normal pts','Normal convhull pts','Faulty surface','Faulty pts','Faulty convhull pts','Location','best');
 
 %% C5) Combined Slice: T=mg => 3D (L,M,N)
-Aeq_T = [1 0 0 0]; beq_T = m*g;
-[V_sliceT_normal, ~, ~] = lcon2vert(A_all_TLMN_normal, b_all_TLMN_normal, Aeq_T, beq_T, 1e-10, true);
-[V_sliceT_fault, ~, ~]  = lcon2vert(A_all_TLMN_fault, b_all_TLMN_fault, Aeq_T, beq_T, 1e-10, true);
 figure('Name','(C5) Combined Slice: T=mg => 3D (L,M,N)','NumberTitle','off');
 hold on;
-if ~isempty(V_sliceT_normal)
-    ptsT_norm = V_sliceT_normal(:, [2,3,4]);
-    [hullT_norm, volT_norm] = convhulln(ptsT_norm);
-    trisurf(hullT_norm, ptsT_norm(:,1), ptsT_norm(:,2), ptsT_norm(:,3), ...
-        'FaceColor','cyan','FaceAlpha',0.3,'EdgeColor','none');
-    plot3(ptsT_norm(:,1), ptsT_norm(:,2), ptsT_norm(:,3), 'bo','MarkerSize',10);
-end
-if ~isempty(V_sliceT_fault)
-    ptsT_faul = V_sliceT_fault(:, [2,3,4]);
-    [hullT_faul, volT_faul] = convhulln(ptsT_faul);
-    trisurf(hullT_faul, ptsT_faul(:,1), ptsT_faul(:,2), ptsT_faul(:,3), ...
-        'FaceColor','magenta','FaceAlpha',0.3,'EdgeColor','none');
-    plot3(ptsT_faul(:,1), ptsT_faul(:,2), ptsT_faul(:,3), 'ro','MarkerSize',10);
-end
+
+%정상
+trisurf(hullT_LMN, sliceT_LMN(:,1), sliceT_LMN(:,2), sliceT_LMN(:,3), ...
+    'FaceColor','cyan','FaceAlpha',0.3,'EdgeColor','b','LineStyle','-');
+plot3(sliceT_LMN(:,1), sliceT_LMN(:,2), sliceT_LMN(:,3), 'bo','MarkerSize',10);
+plot3(sliceT_LMN(convexIdx_T,1), sliceT_LMN(convexIdx_T,2), sliceT_LMN(convexIdx_T,3), ...
+    'ks','MarkerSize',8,'MarkerFaceColor','none');
+
+%고장
+trisurf(triangulation_faces_T, hull_vertices_4D_physical_T(:,2), hull_vertices_4D_physical_T(:,3), hull_vertices_4D_physical_T(:,4), ...
+    'FaceColor','magenta','FaceAlpha',0.3,'EdgeColor','r','LineStyle','--');
+plot3(hull_vertices_4D_physical_T(:,2), hull_vertices_4D_physical_T(:,3), hull_vertices_4D_physical_T(:,4), 'ro','MarkerSize',12);
+plot3(hull_vertices_4D_physical_T(convexIdx_T_fault,2), hull_vertices_4D_physical_T(convexIdx_T_fault,3), hull_vertices_4D_physical_T(convexIdx_T_fault,4), ...
+    'k+','MarkerSize',8,'MarkerFaceColor','none');
+
 xlabel('Roll Moment L (Nm)'); ylabel('Pitch Moment M (Nm)'); zlabel('Yaw Moment N (Nm)');
-title('(C5) Combined Slice: T=mg => (L,M,N)');
+title('(C5) Combined Slice: T=mg => (Roll, Pitch, Yaw)');
 grid on; view(3); camlight; lighting gouraud;
-legend('Normal surface','Normal pts','Faulty surface','Faulty pts','Location','best');
+legend('Normal surface','Normal pts','Normal convhull pts','Faulty surface','Faulty pts','Faulty convhull pts','Location','best');
