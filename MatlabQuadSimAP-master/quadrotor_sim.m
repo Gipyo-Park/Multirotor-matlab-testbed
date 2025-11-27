@@ -22,8 +22,12 @@ init_plot;
 plot_quad_model;
 
 %% Initialize Variables
+% full_model_dynamics;
+
 quad_variables;
-quad_dynamics_nonlinear;   
+model_dynamics;
+quad_dynamics_nonlinear;
+
 
 %% Run The Simulation Loop
 while Quad.t_plot(Quad.counter-1)< max(Quad.t_plot);    
@@ -40,11 +44,57 @@ while Quad.t_plot(Quad.counter-1)< max(Quad.t_plot);
 %     Kalman_Y2;
 
 
+    % if (Quad.counter < 100)
+    %     Quad.phi_des = pi/6;          % desired value of phi (radians)
+    %     Quad.theta_des = 0;        % desired value of theta (radians)
+    %     Quad.psi_des = 0;          % desired value of psi (radians)
+    % elseif (Quad.counter < 300)
+    %     Quad.phi_des = 0;          % desired value of phi (radians)
+    %     Quad.theta_des = pi/6;        % desired value of theta (radians)
+    %     Quad.psi_des = 0;          % desired value of psi (radians)
+    % elseif (Quad.counter < 600)
+    %     Quad.phi_des = -pi/6;          % desired value of phi (radians)
+    %     Quad.theta_des = 0;        % desired value of theta (radians)
+    %     Quad.psi_des = 0;          % desired value of psi (radians)
+    % elseif (Quad.counter < 900)
+    %     Quad.phi_des = 0;          % desired value of phi (radians)
+    %     Quad.theta_des = -pi/6;        % desired value of theta (radians)
+    %     Quad.psi_des = 0;          % desired value of psi (radians)
+    % end
+
+    % if (Quad.counter < 1000)
+    %     Quad.X_des_GF = 0;         % desired value of X in Global frame
+    %     Quad.Y_des_GF = 0;         % desired value of Y in Global frame
+    %     Quad.Z_des_GF = 1;         % desired value of Z in Global frame
+    % elseif (Quad.counter < 3000)
+    %     Quad.X_des_GF = 1;         % desired value of X in Global frame
+    %     Quad.Y_des_GF = 1;         % desired value of Y in Global frame
+    %     Quad.Z_des_GF = 1;         % desired value of Z in Global frame
+    % elseif (Quad.counter < 6000)
+    %     Quad.X_des_GF = 1;         % desired value of X in Global frame
+    %     Quad.Y_des_GF = -1;         % desired value of Y in Global frame
+    %     Quad.Z_des_GF = 1;         % desired value of Z in Global frame
+    % elseif (Quad.counter < 9000)
+    %     Quad.X_des_GF = -1;         % desired value of X in Global frame
+    %     Quad.Y_des_GF = -1;         % desired value of Y in Global frame
+    %     Quad.Z_des_GF = 1;         % desired value of Z in Global frame
+    % end
+
+    
+    % yaw 안 맞추고 Lemniscate 경로 생성
+    % Trajectory_Lemniscate;
+
+
+
     
     % Implement Controller
     position_PID;
-    attitude_PID;
-    rate_PID;
+    % attitude_LQR;
+    % attitude_LQI;
+    % full_LQR;
+    attitude_MPC;
+    % attitude_PID;
+    % rate_PID;
     
     % Calculate Desired Motor Speeds
     quad_motor_speed;
@@ -68,3 +118,13 @@ end
 
 %% Plot Data
 plot_data
+
+% 시뮬 후
+figure();
+plot3(Quad.X_log, Quad.Y_log, Quad.Z_log,'--');
+xlabel('X'), ylabel('Y'), zlabel('Z');
+title('Lemniscate Trajectory');
+grid on;
+hold on;
+% plot3(Quad.X_des_log, Quad.Y_des_log, Quad.Z_des_log);
+legend('simulated trajectory', 'reference');

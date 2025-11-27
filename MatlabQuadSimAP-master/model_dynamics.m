@@ -243,19 +243,12 @@ disp(LQR_df_dx)
 disp('delft_df_du = ')
 disp(LQR_df_du)
 
-disp('size of delft_df_dx = ')
+disp('size of LQR_df_dx = ')
 disp(size(LQR_df_dx))
-disp('size of delft_df_du = ')
+disp('size of LQR_df_du = ')
 disp(size(LQR_df_du))
 
-% assignin('base', 'delft_df_dx', delft_df_dx);
-% assignin('base', 'delft_df_du', delft_df_du);
 
-
-% assignin('base', 'Pos_dot', Pos_dot); %x_dot , y_dot, z_dot
-% assignin('base', 'VB', VB);
-% assignin('base', 'OMEGA', OMEGA);
-% assignin('base', 'OMEGAB', OMEGAB);
 
 
 %% 확인 방법 (LQR일 경우)
@@ -311,3 +304,33 @@ x0 = [0.1; 0; 0.1; 0; 0.1; 0];  % 초기 각도 오차 예시
 initial(sys_cl, x0);
 title('Closed-loop initial Response (LQI)');
 
+%% MPC /  선형화하기위해 가정으로 인해 phi_dot ≈ p , theta_dot ≈ q , psi_dot ≈ r
+
+% X = [phi; phi_dot; theta; theta_dot; psi; psi_dot]
+% u = [tau_x; tau_y; tau_z]
+% y = [phi; theta; psi]
+
+X_dot = [phi_dot; phi_ddot; theta_dot; theta_ddot; psi_dot; psi_ddot];
+Am = jacobian(X_dot,[phi; phi_dot; theta; theta_dot; psi; psi_dot]); % phi_dot ≈ p , theta_dot ≈ q , psi_dot ≈ r 
+Bm = jacobian(X_dot,[tau_x; tau_y; tau_z]);
+
+% 평형점에서 평가 (phi=0, phi_dot=0, theta=0, theta_dot=0, psi=0, psi_dot=0)
+Quad.Am = double(subs(Am, {phi,phi_dot,theta,theta_dot,psi,psi_dot}, {0, 0, 0, 0, 0, 0}));
+Quad.Bm = double(subs(Bm, {phi,phi_dot,theta,theta_dot,psi,psi_dot}, {0, 0, 0, 0, 0, 0}));
+
+Quad.Cm = [1 0 0 0 0 0;
+      0 0 1 0 0 0;
+      0 0 0 0 1 0];
+Quad.Dm = zeros(3,3);
+
+% [Ad,Bd,Cd,Dd] = c2dm(Am,Bm,Cm,Dm,0.01); % Converting from Continuous to Discrete Time
+
+% [A_aug,B_aug,C_aug] = augment_mimo(Ad, Bd, Cd, num_of_states, num_of_inputs, num_of_outputs);
+% [P, H] = calculate_prediction_matrices(A_aug, B_aug, C_aug, Np, Nc); % Y = P*X(k) + H*U(k)
+% 
+% 
+% umax = [Quad.U2_max ; Quad.U3_max ; Quad.U4_max];
+% umin = [Quad.U2_min ; Quad.U3_min ; Quad.U4_min];
+% Delta_umax = 0.6*umax;
+% 
+% [CC, dd, dupast] = constraints_mimo(Delta_umax, umax, umin, num_of_inputs, Nc);

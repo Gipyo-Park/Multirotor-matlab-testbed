@@ -80,6 +80,7 @@ Quad.U1 = min(Quad.U1_max, max(Quad.U1_min, Quad.U1));
 
 %% Attitude Controller
 
+desired_attitude = [Quad.phi_des; Quad.theta_des; Quad.psi_des];
 % phi error
 % phi_error = Quad.phi_des - phi;
 phi_error = phi - Quad.phi_des;

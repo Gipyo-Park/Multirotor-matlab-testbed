@@ -81,5 +81,9 @@ Quad.psi_ref_plot(Quad.counter) = Quad.psi_des;
 
 Quad.counter = Quad.counter + 1;
 
+Quad.X_log(Quad.counter) = Quad.X;
+Quad.Y_log(Quad.counter) = Quad.Y;
+Quad.Z_log(Quad.counter) = Quad.Z;
+
 end
 

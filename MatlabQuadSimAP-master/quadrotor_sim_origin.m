@@ -7,6 +7,9 @@
 %                                                                       %
 %-----------------------------------------------------------------------%
 
+% Add Paths
+addpath utilities
+
 %% Initialize Workspace
 clear all;
 close all;
@@ -26,14 +29,22 @@ quad_dynamics_nonlinear;
 while Quad.t_plot(Quad.counter-1)< max(Quad.t_plot);    
     
     % Measure Parameters (for simulating sensor errors)
-    sensor_meas;
+      sensor_meas;
 
     % Filter Measurements
-    
+%     Kalman_phi2;
+%     Kalman_theta2;
+%     Kalman_psi2;
+%     Kalman_Z2;
+%     Kalman_X2;
+%     Kalman_Y2;
+
+
     
     % Implement Controller
-    % outer_PID;
-    inner_PID;
+    position_PID;
+    attitude_PID;
+    rate_PID;
     
     % Calculate Desired Motor Speeds
     quad_motor_speed;
