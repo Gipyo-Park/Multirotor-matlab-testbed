@@ -24,7 +24,7 @@
 - Gerono Lemniscate reference trajectory 생성
 - 3D animation과 실제/기준 궤적 시각화
 - RMSE, MAE, Maximum Error 기반 정량 평가
-- 선택적 ACS(Attainable Control Set) 및 actuator-fault 분석
+- 멀티로터의 정상과 고장 상태에서의 ACS(Attainable Control Set) 분석
 
 현재 `quadrotor_sim.m`의 기본 구성은 **Position PID + Altitude PID + Attitude NMPC**입니다. Simulink 모델도 포함되어 있지만, 주요 실험은 `.m` 파일을 중심으로 수행합니다.
 
