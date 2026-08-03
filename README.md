@@ -44,13 +44,20 @@
 ## 제어 구조 | Compact Control Architecture
 
 ```mermaid
-flowchart LR
-    A["Reference<br/>Xd, Yd, Zd"] --> B["Position PID"]
-    B --> C["Attitude Controller<br/>+ Altitude PID"]
-    C --> D["Motor Mixer<br/>& Limits"]
-    D --> E["6-DOF<br/>Plant"]
-    E -. "state feedback" .-> B
-    E -.-> C
+flowchart TD
+    A["Lemniscate reference<br/>Xᵈ, Yᵈ, Zᵈ"] --> B["Position PID<br/>outer loop"]
+    B --> C["Desired roll & pitch<br/>φᵈ, θᵈ"]
+    C --> D["Attitude controller<br/>PID · LQR · LQI · MPC · NMPC"]
+    A --> E["Altitude PID<br/>total thrust U₁"]
+    D --> F["Body torques<br/>U₂, U₃, U₄"]
+    E --> G["Motor mixer & saturation"]
+    F --> G
+    G --> H["Nonlinear 6-DOF dynamics"]
+    H --> I["Sensor model, logging<br/>& 3D visualization"]
+    I --> B
+    I --> D
+    classDef compact font-size:11px;
+    class A,B,C,D,E,F,G,H,I compact;
 ```
 
 ### 매 시간 스텝의 처리 과정 | One Simulation Step
@@ -244,18 +251,25 @@ X/Y 두 축을 연속적으로 가진하므로 controller lag, overshoot, actuat
 
 ### 정량 비교 | Tracking Metrics
 
-| Reference period | Controller | 3D RMSE (m) | 3D MAE (m) |
-|---:|---|---:|---:|
-| 1.0 | PID | 0.1030 | 0.0698 |
-| 1.0 | LQR | 0.1021 | 0.0686 |
-| 1.0 | LQI | 0.1014 | 0.0672 |
-| 1.0 | MPC | 0.1014 | 0.0674 |
-| 1.0 | **NMPC** | **0.1012** | **0.0669** |
-| 0.3 | PID | 0.2371 | 0.2235 |
-| 0.3 | MPC | 0.1544 | 0.1339 |
-| 0.3 | **NMPC** | **0.1526** | **0.1312** |
+#### Reference Period 1.0
 
-빠른 reference 조건(0.3)에서 NMPC는 PID 대비 **3D RMSE 35.6%**, **3D MAE 41.3%** 감소를 보였습니다. MPC와 NMPC가 기준 경로가 빨라졌을 때 figure-eight 형상을 더 안정적으로 유지했습니다.
+| Controller | 3D RMSE (m) | 3D MAE (m) |
+|---|---:|---:|
+| PID | 0.1030 | 0.0698 |
+| LQR | 0.1021 | 0.0686 |
+| LQI | 0.1014 | 0.0672 |
+| MPC | 0.1014 | 0.0674 |
+| **NMPC** | **0.1012** | **0.0669** |
+
+#### Reference Period 0.3
+
+| Controller | 3D RMSE (m) | 3D MAE (m) |
+|---|---:|---:|
+| PID | 0.2371 | 0.2235 |
+| MPC | 0.1544 | 0.1339 |
+| **NMPC** | **0.1526** | **0.1312** |
+
+Reference Period 0.3 실험에서는 MPC와 NMPC의 평균 3D 추종 오차가 PID보다 작았습니다. 그중 NMPC는 PID 대비 **3D RMSE 35.6%**, **3D MAE 41.3%** 낮았습니다.
 
 > 3D metric에는 `Z = 0 m`에서 `Z = 1 m`로 이동하는 초기 고도 과도응답이 포함됩니다. 따라서 Maximum Error는 steady-state tracking보다 초기 이륙 오차의 영향을 크게 받습니다. 결과는 controller weight, noise seed, trajectory parameter에 따라 달라질 수 있습니다.
 
@@ -263,42 +277,42 @@ X/Y 두 축을 연속적으로 가진하므로 controller lag, overshoot, actuat
 
 <table>
   <tr>
-    <th>PID — Baseline Tracking</th>
-    <th>LQR — Linear Optimal Feedback</th>
+    <th>PID–PID · Reference Period 1.0</th>
+    <th>PID–LQR · Reference Period 1.0</th>
   </tr>
   <tr>
     <td><img src="docs/assets/trajectory-pid-period-1.0.png" width="100%" alt="PID trajectory result at period 1.0"></td>
     <td><img src="docs/assets/trajectory-lqr-period-1.0.png" width="100%" alt="LQR trajectory result at period 1.0"></td>
   </tr>
   <tr>
-    <th>LQI — Integral-augmented LQR</th>
-    <th>MPC — Constrained Linear Prediction</th>
+    <th>PID–LQI · Reference Period 1.0</th>
+    <th>PID–MPC · Reference Period 1.0</th>
   </tr>
   <tr>
     <td><img src="docs/assets/trajectory-lqi-period-1.0.png" width="100%" alt="LQI trajectory result at period 1.0"></td>
     <td><img src="docs/assets/trajectory-mpc-period-1.0.png" width="100%" alt="MPC trajectory result at period 1.0"></td>
   </tr>
   <tr>
-    <th colspan="2">NMPC — Nonlinear Receding-horizon Control</th>
+    <th colspan="2">PID–NMPC · Reference Period 1.0</th>
   </tr>
   <tr>
     <td colspan="2" align="center"><img src="docs/assets/trajectory-nmpc-period-1.0.png" width="72%" alt="NMPC trajectory result at period 1.0"></td>
   </tr>
 </table>
 
-### Reference Period 0.3 — Faster Reference Tracking
+### Reference Period 0.3 — Controller별 경로 추종 결과
 
 <table>
   <tr>
-    <th>PID — Fast Reference</th>
-    <th>MPC — Fast Reference</th>
+    <th>PID–PID · Reference Period 0.3</th>
+    <th>PID–MPC · Reference Period 0.3</th>
   </tr>
   <tr>
     <td><img src="docs/assets/trajectory-pid-period-0.3.png" width="100%" alt="PID faster-reference trajectory result"></td>
     <td><img src="docs/assets/trajectory-mpc-period-0.3.png" width="100%" alt="MPC faster-reference trajectory result"></td>
   </tr>
   <tr>
-    <th colspan="2">NMPC — Best 3D RMSE / MAE in the Faster-reference Test</th>
+    <th colspan="2">PID–NMPC · Reference Period 0.3</th>
   </tr>
   <tr>
     <td colspan="2" align="center"><img src="docs/assets/trajectory-nmpc-period-0.3.png" width="72%" alt="NMPC faster-reference trajectory result"></td>
@@ -338,28 +352,6 @@ quadrotor_sim
 ```
 
 `quadrotor_sim.m`의 Attitude Controller 구간에서 사용할 제어기를 하나만 활성화합니다. 경로 추종 simulation만 빠르게 확인할 경우 optional pre-analysis인 `model_dynamics`와 `quad_ACS` 호출을 비활성화하면 startup 계산과 추가 figure 생성을 줄일 수 있습니다.
-
-## 저장소 구조 | Repository Map
-
-```text
-Multirotor-matlab-testbed/
-├── MatlabQuadSimAP-master/
-│   ├── quadrotor_sim.m          # main script-based experiment
-│   ├── quadrotor_sim_origin.m   # original cascaded-PID baseline
-│   ├── model_dynamics.m         # linearization and gain/model setup
-│   ├── quad_ACS.m               # optional attainable-control-set analysis
-│   ├── QuadrotorSimulink.mdl    # optional Simulink model
-│   └── utilities/
-│       ├── attitude_LQR.m
-│       ├── attitude_MPC.m
-│       ├── attitude_NMPC.m
-│       ├── position_PID.m
-│       ├── quad_motor_speed.m
-│       ├── quad_dynamics_nonlinear.m
-│       ├── Trajectory_Lemniscate.m
-│       └── calculate_performance.m
-└── docs/assets/                 # README animations and result plots
-```
 
 ## 출력 항목 | Evaluation Outputs
 
