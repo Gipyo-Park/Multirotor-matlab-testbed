@@ -21,7 +21,7 @@
 - Position–attitude cascaded control architecture
 - PID, LQR, LQI, Linear MPC, Nonlinear MPC 구현
 - Motor control allocation과 rotor-speed saturation 반영
-- Gerono Lemniscate reference trajectory 생성
+- Lemniscate reference trajectory 생성
 - 3D animation과 실제/기준 궤적 시각화
 - RMSE, MAE, Maximum Error 기반 정량 평가
 - 멀티로터의 정상과 고장 상태에서의 ACS(Attainable Control Set) 분석
@@ -30,7 +30,7 @@
 
 ## 핵심 구현 | Key Contributions
 
-본 저장소는 [Wil Selby의 MatlabQuadSimAP](https://github.com/wilselby/MatlabQuadSimAP)를 기반으로 다음 기능을 확장한 프로젝트입니다.
+이 레포지토리는는 [Wil Selby의 MatlabQuadSimAP](https://github.com/wilselby/MatlabQuadSimAP)를 기반으로 확장한 프로젝트입니다.
 
 - Hover equilibrium에서 자세 동역학을 선형화하고 LQR/LQI gain 설계
 - PID, LQR, LQI, MPC, NMPC를 교체 가능한 attitude controller로 구현
